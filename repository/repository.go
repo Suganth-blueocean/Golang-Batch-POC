@@ -14,6 +14,7 @@ type DB struct {
 	database *mongo.Database
 }
 
+
 func (db *DB) FindAllByLimit(collectionName string, document any) error {
 	collection := db.database.Collection(collectionName)
 	opts := options.Find().SetLimit(100)

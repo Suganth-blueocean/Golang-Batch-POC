@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/blu-ocean/bo-common-module/unitofwork"
+	"github.com/blu-ocean/bo-customer-service/service"
 )
 
 // These workers will receive work on the `jobs` channel and send the corresponding
@@ -26,10 +29,16 @@ func main() {
 	for w := 1; w <= 5; w++ {
 		go worker(w, jobs, results)
 	}
-
-	// Here we send 5 `jobs` and then `close` that channel to indicate that's all the work we have.
-	for j := 1; j <= 5; j++ {
-		jobs <- j
+	a := 1
+	unitOfWork := unitofwork.NewUnitOfWork()
+	// Here we send 10 `jobs` and then `close` that channel to indicate that's all the work we have.
+	for true {
+		customers, err := service.GetAllCustomerByLimit(unitOfWork.Context, 100)
+		if err != nil {
+			return
+		}
+		jobs <- customers[a].Mobile
+		a += 1
 	}
 	close(jobs)
 
